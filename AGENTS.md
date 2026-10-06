@@ -12,4 +12,4 @@ Private, English-language library of portable skills, configuration assets, and 
 - Preserve product architecture. Implement selected tooling autonomously; discuss changes to hosting, databases, persistence, or application boundaries before introducing them.
 - Installer changes must preserve unmanaged files and reject locally modified managed content, unsafe paths, and symlinks. Test install/update/remove and failure cases in temporary directories.
 - No lifecycle installation hooks. No runtime dependencies in the installer. Never publish plaintext credentials or environment files.
-- Registry publication is a separate release operation. GitHub Packages is the private distribution target; repository linkage is supplied during setup.
+- GitHub Packages is the private distribution target. Each master commit publishes a CI-only prerelease version; explicit version tags publish stable releases. PRs never publish. Preserve immutable versions and keep credentials scoped to publication.

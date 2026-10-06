@@ -85,13 +85,26 @@ Automatic selection is enabled. A selected deployment provider or database is re
 
 ## Publish privately
 
-1. The private repository is [obergodmar/agents](https://github.com/obergodmar/agents). Its `origin` remote is configured locally. Make the initial commit and push `master` before setting or verifying the GitHub default branch; GitHub cannot set a default branch on an empty repository.
+1. The private repository is [obergodmar/agents](https://github.com/obergodmar/agents), with `master` as its default branch.
 2. Package.json links to `git+https://github.com/obergodmar/agents.git`. If changing the repository owner or package scope, update repository metadata, publishConfig, registry configuration, and these instructions together. GitHub Packages scopes follow the owning account/organization.
 3. Enable Actions and the package permissions needed by this repository. The release workflow uses `GITHUB_TOKEN` with package write access; no stored npm publishing token is required.
-4. Review the version, run checks and inspect `agents-pack`. Commit the version and lockfile changes, then create and push the corresponding `vVERSION` tag when ready to release.
+4. Push commits to `master` to publish automatic versions. For an intentional stable release, review/update the source version, run checks, commit the changes, then push the corresponding `vVERSION` tag.
 5. Confirm package visibility is private and grant consumers read access. `publishConfig.access` is restricted. Package.json omits `private: true` because that flag forbids publication; it does not control registry visibility.
 
-CI runs through Nix/devenv. Tagged releases rerun checks, validate repository linkage and version/tag agreement, pack, then publish to GitHub Packages. A missing repository field intentionally blocks publishing. npmjs.com OIDC trusted publishing is a different distribution mode and is not configured here.
+CI runs through Nix/devenv. PRs run checks without publication. Every push to `master` selects all newly reachable commits, including intermediate commits in a batch, and checks/packages each snapshot independently. Failed checks block that snapshot's publication, without canceling the other commits.
+
+Automatic versions use `BASE-master.RUN.COMMIT_ORDER.ATTEMPT.gSHORT_SHA`, for example `0.1.0-master.12.2.1.gabcdef123456`. The source `package.json` keeps its base version; CI stamps only its temporary checkout and records `gitHead`. Reruns get distinct versions. The pushed head publishes under the `master` dist-tag; intermediate snapshots use `commits` and remain installable by exact version. Tagged stable releases validate version/tag agreement and publish under `latest`.
+
+After configuring private-registry authentication, install the current successful master build and pin its resolved version:
+
+```sh
+pnpm add -D --save-exact @obergodmar/agent-skills@master
+pnpm exec agent-workflows install --target .
+```
+
+For updates, repeat the add command, then use `agent-workflows update`. An unqualified dependency uses `latest`, which is reserved for intentional stable releases.
+
+Publication workflows queue instead of canceling older pushes. GitHub currently allows 100 queued workflows and at most 256 matrix commits per push. Only the push head changes the `master` alias; failed builds leave the previous package available. Package publication uses the workflow's `GITHUB_TOKEN`; no version-bump commits, automatic Git tags, or extra publishing secrets are generated. A missing repository field intentionally blocks publishing. npmjs.com OIDC trusted publishing is a different distribution mode and is not configured here.
 
 ## Extend
 

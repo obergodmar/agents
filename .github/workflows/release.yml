@@ -1,18 +1,48 @@
 name: Publish private package
 on:
   push:
+    branches: [master]
     tags: ['v*']
 permissions:
   contents: read
+concurrency:
+  group: private-package-publication
+  queue: max
 jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v17
+        with:
+          name: devenv
+      - run: nix profile add github:cachix/devenv/v2.3.1
+      - name: Select every newly pushed commit
+        id: plan
+        run: devenv shell -- node scripts/release-plan.mjs
   publish:
+    needs: plan
+    name: Publish ${{ matrix.sha }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     permissions:
       contents: read
       packages: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ matrix.sha }}
+          fetch-depth: 0
       - uses: cachix/install-nix-action@v31
       - uses: cachix/cachix-action@v17
         with:
@@ -20,14 +50,30 @@ jobs:
       - run: nix profile add github:cachix/devenv/v2.3.1
       - run: devenv shell -- agents-install
       - run: devenv shell -- agents-check
-      - name: Validate release identity
-        run: devenv shell -- node scripts/release-check.mjs
+      - name: Prepare immutable package version
+        id: package
+        env:
+          PACKAGE_COMMIT_SHA: ${{ matrix.sha }}
+          PACKAGE_COMMIT_ORDER: ${{ matrix.order }}
+        run: |
+          git show "$GITHUB_SHA:scripts/release-check.mjs" > "$RUNNER_TEMP/release-check.mjs"
+          devenv shell -- node "$RUNNER_TEMP/release-check.mjs"
       - run: devenv shell -- agents-pack
       - name: Publish to GitHub Packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGE_ARCHIVE: ${{ steps.package.outputs.archive }}
+          PACKAGE_DIST_TAG: ${{ steps.package.outputs.dist-tag }}
+          PACKAGE_COMMIT_SHA: ${{ matrix.sha }}
         run: |
           config="$RUNNER_TEMP/agent-workflows.npmrc"
           printf '%s\n' '@obergodmar:registry=https://npm.pkg.github.com' '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}' > "$config"
           chmod 600 "$config"
-          NPM_CONFIG_USERCONFIG="$config" devenv shell -- npm publish artifacts/*.tgz --ignore-scripts
+          if [ "$PACKAGE_DIST_TAG" = master ]; then
+            remote_head="$(devenv shell -- git ls-remote origin refs/heads/master)"
+            if [ "${remote_head%%[[:space:]]*}" != "$PACKAGE_COMMIT_SHA" ]; then
+              PACKAGE_DIST_TAG=commits
+            fi
+          fi
+          NPM_CONFIG_USERCONFIG="$config" devenv shell -- npm publish "$PACKAGE_ARCHIVE" --tag "$PACKAGE_DIST_TAG" --ignore-scripts
+          printf 'Published `%s` with tag `%s` from `%s`.\n' "$PACKAGE_ARCHIVE" "$PACKAGE_DIST_TAG" "$PACKAGE_COMMIT_SHA" >> "$GITHUB_STEP_SUMMARY"
