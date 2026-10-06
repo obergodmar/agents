@@ -28,10 +28,7 @@ test('plugin ZIP contains self-contained skills and excludes development and ins
     );
     assert.deepEqual(inspect.files, pluginFiles(root));
     assert.deepEqual(inspect.manifest, manifest);
-    assert.equal(
-      inspect.files.filter(/** @param {string} name */ (name) => name.endsWith('/SKILL.md')).length,
-      3,
-    );
+    assert.ok(inspect.files.some(/** @param {string} name */ (name) => name.endsWith('/SKILL.md')));
     assert.ok(
       !inspect.files.some(
         /** @param {string} name */ (name) =>

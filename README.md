@@ -51,7 +51,14 @@ Commit `.codex/config.toml` to enable it for the trusted project:
 enabled = true
 ```
 
-From that project, run `codex plugin list --available --json` to inspect discovery and `codex plugin add agent-workflows@agent-workflows` to install. The desktop app can also install from the project's catalog. Codex loads project config only for trusted projects. `ON_USE` is the catalog policy field; this skills-only plugin has no service authentication.
+From that project, explicitly register its catalog before installing:
+
+```sh
+codex plugin marketplace add .
+codex plugin add agent-workflows@agent-workflows
+```
+
+Inspect discovery with `codex plugin list --marketplace agent-workflows --available --json`. The desktop app can also install from the project's catalog. Explicit registration works in CLI versions that do not automatically discover repo catalogs. Codex loads project config only for trusted projects. `ON_USE` is the catalog policy field; this skills-only plugin has no service authentication.
 
 Allowlist only the marketplace file and project config if their folders are otherwise ignored. Keep personal state ignored. Do not duplicate the same skills under `.agents/skills` or a user skills folder. Application installation, CI, and deployment do not require Codex or the plugin.
 
@@ -64,7 +71,7 @@ codex plugin marketplace upgrade agent-workflows
 codex plugin add agent-workflows@agent-workflows
 ```
 
-For a project catalog, review a new commit, change `source.sha`, and commit it. Refresh/reinstall through Codex and start a new session. Changing plugin version metadata does not advance a pinned Git source.
+For a project catalog, review a new commit, change `source.sha`, and commit it. Register that project's catalog and reinstall through Codex, then start a new session. Do not keep a separate personal marketplace with the same name pointing to another revision. Changing plugin version metadata does not advance a pinned Git source.
 
 Set `enabled = false` in project config to disable it there. `codex plugin remove agent-workflows@agent-workflows` removes the local installation. Remove this plugin's tracked catalog entry/config section to remove the project's declaration; preserve other entries and settings.
 
