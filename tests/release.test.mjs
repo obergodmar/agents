@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -67,6 +67,29 @@ test('publisher stamps the archive version and exact commit in an isolated CI ch
     assert.equal(stamped.version, releaseIdentity(pkg, context).version);
     assert.equal(stamped.gitHead, sha);
     assert.match(readFileSync(output, 'utf8'), /dist-tag=master/);
+    mkdirSync(join(root, 'artifacts'));
+    execFileSync('npm', ['pack', '--ignore-scripts', '--pack-destination', 'artifacts'], {
+      cwd: root,
+      stdio: 'pipe',
+    });
+    // A bare artifacts/file.tgz is parsed as GitHub shorthand by npm.
+    const preview = execFileSync(
+      'npm',
+      [
+        'publish',
+        releaseIdentity(pkg, context).archive,
+        '--dry-run',
+        '--ignore-scripts',
+        '--tag',
+        'master',
+      ],
+      {
+        cwd: root,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      },
+    );
+    assert.match(preview, new RegExp(stamped.version.replaceAll('.', '\\.')));
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

@@ -44,7 +44,7 @@ export function releaseIdentity(pkg, env) {
       'Release tag must match the source version',
     );
   }
-  const archive = `artifacts/${pkg.name.slice(1).replace('/', '-')}-${version}.tgz`;
+  const archive = `./artifacts/${pkg.name.slice(1).replace('/', '-')}-${version}.tgz`;
   return { version, tag, archive, sha };
 }
 
