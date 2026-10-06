@@ -1,0 +1,33 @@
+name: Publish private package
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v17
+        with:
+          name: devenv
+      - run: nix profile add github:cachix/devenv/v2.3.1
+      - run: devenv shell -- agents-install
+      - run: devenv shell -- agents-check
+      - name: Validate release identity
+        run: devenv shell -- node scripts/release-check.mjs
+      - run: devenv shell -- agents-pack
+      - name: Publish to GitHub Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          config="$RUNNER_TEMP/agent-workflows.npmrc"
+          printf '%s\n' '@obergodmar:registry=https://npm.pkg.github.com' '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}' > "$config"
+          chmod 600 "$config"
+          NPM_CONFIG_USERCONFIG="$config" devenv shell -- npm publish artifacts/*.tgz --ignore-scripts

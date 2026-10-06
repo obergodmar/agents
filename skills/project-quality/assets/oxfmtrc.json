@@ -1,0 +1,17 @@
+{
+  "tabWidth": 2,
+  "singleQuote": true,
+  "printWidth": 100,
+  "semi": true,
+  "trailingComma": "all",
+  "ignorePatterns": [
+    "node_modules/**",
+    ".devenv/**",
+    ".direnv/**",
+    "dist/**",
+    "coverage/**",
+    "pnpm-lock.yaml",
+    "package-lock.json",
+    "devenv.lock"
+  ]
+}

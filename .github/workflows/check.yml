@@ -1,0 +1,25 @@
+name: Check
+on:
+  push:
+    branches: [master]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v17
+        with:
+          name: devenv
+      - name: Install pinned devenv
+        run: nix profile add github:cachix/devenv/v2.3.1
+      - run: devenv shell -- agents-install
+      - run: devenv shell -- agents-check
+      - run: devenv shell -- agents-pack

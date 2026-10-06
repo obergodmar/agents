@@ -1,0 +1,6 @@
+interface:
+  display_name: 'Devenv workflow'
+  short_description: 'Reproducible Nix tooling and prefixed commands'
+  default_prompt: 'Use $devenv-workflow to configure this project according to its accepted decisions.'
+policy:
+  allow_implicit_invocation: true

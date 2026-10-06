@@ -1,0 +1,8 @@
+node_modules/
+.devenv/
+.direnv/
+artifacts/
+result
+.env
+.env.*
+!.env.example

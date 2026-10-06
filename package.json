@@ -1,0 +1,51 @@
+{
+  "name": "@obergodmar/agent-skills",
+  "version": "0.1.0",
+  "description": "Private portable agent workflows for reproducible development, quality, and deployment",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/obergodmar/agents.git"
+  },
+  "bin": {
+    "agent-workflows": "scripts/cli.mjs"
+  },
+  "files": [
+    "scripts/cli.mjs",
+    "skills/",
+    "instructions/",
+    "README.md"
+  ],
+  "type": "module",
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "scripts": {
+    "skills": "node scripts/cli.mjs",
+    "validate": "node scripts/validate.mjs",
+    "format": "oxfmt --write . && pnpm format:nix && pnpm format:yaml",
+    "format:check": "oxfmt --check . && pnpm format:nix:check && pnpm format:yaml:check",
+    "format:nix": "nixfmt devenv.nix skills/devenv-workflow/assets/package-scripts.nix skills/project-deployment/assets/flake.nix",
+    "format:nix:check": "nixfmt --check devenv.nix skills/devenv-workflow/assets/package-scripts.nix skills/project-deployment/assets/flake.nix",
+    "format:yaml": "yamlfmt devenv.yaml pnpm-workspace.yaml .github/workflows skills/devenv-workflow/agents/openai.yaml skills/project-quality/agents/openai.yaml skills/project-deployment/agents/openai.yaml",
+    "format:yaml:check": "yamlfmt -lint devenv.yaml pnpm-workspace.yaml .github/workflows skills/devenv-workflow/agents/openai.yaml skills/project-quality/agents/openai.yaml skills/project-deployment/agents/openai.yaml",
+    "lint": "oxlint --deny-warnings scripts tests",
+    "lint:fix": "oxlint --fix scripts tests",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs",
+    "test:nix": "node scripts/test-nix.mjs",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm validate && pnpm test && pnpm test:nix",
+    "pack": "node scripts/pack.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.5",
+    "oxfmt": "0.68.0",
+    "oxlint": "1.83.0",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@11.25.0"
+}
