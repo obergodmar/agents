@@ -50,6 +50,18 @@ test('stable tags use latest, and mismatched tags, scopes, and PRs cannot publis
     assert.throws(() => releaseIdentity(pkg, { ...context, ...changes }));
 });
 
+test('npm publication requires the public registry and allows an independent organization scope', () => {
+  assert.equal(
+    releaseIdentity({ ...pkg, name: '@another-org/agent-skills' }, context).tag,
+    'master',
+  );
+  for (const publishConfig of [
+    { registry: 'https://npm.pkg.github.com', access: 'public' },
+    { registry: 'https://registry.npmjs.org', access: 'restricted' },
+  ])
+    assert.throws(() => releaseIdentity({ ...pkg, publishConfig }, context));
+});
+
 test('publisher stamps the archive version and exact commit in an isolated CI checkout', () => {
   const root = mkdtempSync(join(tmpdir(), 'agent-release-'));
   try {

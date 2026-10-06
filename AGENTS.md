@@ -1,6 +1,6 @@
 # Agent workflows
 
-Private, English-language library of portable skills, configuration assets, and a Codex installer. Work on `master`; use Conventional Commits when a commit is requested.
+Public, English-language library of portable skills, configuration assets, and a Codex installer. Work on `master`; use Conventional Commits when a commit is requested.
 
 - Enter through direnv or `devenv shell -- <command>`. Nix owns system tools; pnpm owns package dependencies.
 - Root package scripts are authoritative; devenv exposes `agents-*` wrappers.
@@ -12,4 +12,4 @@ Private, English-language library of portable skills, configuration assets, and 
 - Preserve product architecture. Implement selected tooling autonomously; discuss changes to hosting, databases, persistence, or application boundaries before introducing them.
 - Installer changes must preserve unmanaged files and reject locally modified managed content, unsafe paths, and symlinks. Test install/update/remove and failure cases in temporary directories.
 - No lifecycle installation hooks. No runtime dependencies in the installer. Never publish plaintext credentials or environment files.
-- GitHub Packages is the private distribution target. Each master commit publishes a CI-only prerelease version; explicit version tags publish stable releases. PRs never publish. Preserve immutable versions and keep credentials scoped to publication.
+- npmjs.org is the public distribution target under the npm organization scope. GitHub and npm owners need not match. Use OIDC trusted publishing from GitHub Actions. Each master commit publishes a CI-only prerelease version; explicit version tags publish stable releases. PRs never publish. Preserve immutable versions.

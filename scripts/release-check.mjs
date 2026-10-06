@@ -7,19 +7,14 @@ import { fileURLToPath } from 'node:url';
 /** @param {Package} pkg @param {Record<string, string | undefined>} env */
 export function releaseIdentity(pkg, env) {
   assert.equal(env.GITHUB_EVENT_NAME, 'push', 'Only push events can publish');
-  assert.equal(pkg.publishConfig.registry, 'https://npm.pkg.github.com');
-  assert.equal(pkg.publishConfig.access, 'restricted');
+  assert.equal(pkg.publishConfig.registry, 'https://registry.npmjs.org');
+  assert.equal(pkg.publishConfig.access, 'public');
   const repository = env.GITHUB_REPOSITORY;
   assert.ok(repository, 'GitHub repository identity is required');
   assert.equal(
     pkg.repository?.url,
     `git+https://github.com/${repository}.git`,
     'Package repository must match the workflow repository',
-  );
-  assert.equal(
-    pkg.name.split('/')[0].slice(1).toLowerCase(),
-    repository.split('/')[0].toLowerCase(),
-    'Package scope must match repository owner',
   );
   assert.match(pkg.name, /^@[a-z0-9-]+\/[a-z0-9-]+$/);
   assert.match(

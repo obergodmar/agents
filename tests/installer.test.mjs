@@ -12,6 +12,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { run } from '../scripts/cli.mjs';
 
 /** @param {(root: string) => void} work */
@@ -25,6 +26,23 @@ function fixture(work) {
 }
 const skill = '.agents/skills/devenv-workflow/SKILL.md';
 const manifest = '.agents/agent-workflows.json';
+
+test('managed instructions survive Oxfmt in projects with 2-space and 4-space styles', () =>
+  fixture((root) => {
+    run('install', root);
+    const path = join(root, 'AGENTS.md');
+    for (const tabWidth of [2, 4]) {
+      writeFileSync(join(root, '.oxfmtrc.json'), JSON.stringify({ tabWidth }));
+      const formatted = execFileSync('oxfmt', ['--stdin-filepath', path], {
+        cwd: root,
+        input: readFileSync(path, 'utf8'),
+        encoding: 'utf8',
+      });
+      writeFileSync(path, formatted);
+      assert.match(run('doctor', root), /verified/);
+      run('update', root);
+    }
+  }));
 
 test('updates remove retired owned files and preserve unmanaged additions', () =>
   fixture((root) => {

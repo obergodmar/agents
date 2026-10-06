@@ -1,4 +1,4 @@
-name: Publish private package
+name: Publish npm package
 on:
   push:
     branches: [master]
@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: private-package-publication
+  group: npm-package-publication
   queue: max
 jobs:
   plan:
@@ -37,7 +37,7 @@ jobs:
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     permissions:
       contents: read
-      packages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v7
         with:
@@ -59,15 +59,14 @@ jobs:
           git show "$GITHUB_SHA:scripts/release-check.mjs" > "$RUNNER_TEMP/release-check.mjs"
           devenv shell -- node "$RUNNER_TEMP/release-check.mjs"
       - run: devenv shell -- agents-pack
-      - name: Publish to GitHub Packages
+      - name: Publish to npm with OIDC
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PACKAGE_ARCHIVE: ${{ steps.package.outputs.archive }}
           PACKAGE_DIST_TAG: ${{ steps.package.outputs.dist-tag }}
           PACKAGE_COMMIT_SHA: ${{ matrix.sha }}
         run: |
           config="$RUNNER_TEMP/agent-workflows.npmrc"
-          printf '%s\n' '@obergodmar:registry=https://npm.pkg.github.com' '//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}' > "$config"
+          printf '%s\n' 'registry=https://registry.npmjs.org' '@obergodmar:registry=https://registry.npmjs.org' > "$config"
           chmod 600 "$config"
           if [ "$PACKAGE_DIST_TAG" = master ]; then
             remote_head="$(devenv shell -- git ls-remote origin refs/heads/master)"
@@ -75,5 +74,5 @@ jobs:
               PACKAGE_DIST_TAG=commits
             fi
           fi
-          NPM_CONFIG_USERCONFIG="$config" devenv shell -- npm publish "$PACKAGE_ARCHIVE" --tag "$PACKAGE_DIST_TAG" --ignore-scripts
+          NPM_CONFIG_USERCONFIG="$config" devenv shell -- npm publish "$PACKAGE_ARCHIVE" --registry=https://registry.npmjs.org --access public --tag "$PACKAGE_DIST_TAG" --ignore-scripts
           printf 'Published `%s` with tag `%s` from `%s`.\n' "$PACKAGE_ARCHIVE" "$PACKAGE_DIST_TAG" "$PACKAGE_COMMIT_SHA" >> "$GITHUB_STEP_SUMMARY"

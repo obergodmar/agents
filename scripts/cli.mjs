@@ -211,7 +211,7 @@ export function run(command, target) {
   for (const relative of Object.keys(old?.files ?? {})) {
     if (!(relative in next.files)) changes.set(relative, null);
   }
-  const agentsBlock = `${begin}\nBefore working, read [shared working agreements](${baselinePath}).\nInstalled workflows: ${next.names.map((name) => `\`${name}\``).join(', ')}.\nProject-specific instructions and accepted decisions remain authoritative.\n${end}`;
+  const agentsBlock = `${begin}\n\nBefore working, read [shared working agreements](${baselinePath}).\nInstalled workflows: ${next.names.map((name) => `\`${name}\``).join(', ')}.\nProject-specific instructions and accepted decisions remain authoritative.\n${end}`;
   const updated = old
     ? agents.replace(old.agentsBlock, agentsBlock)
     : `${agents}${agents ? '\n\n' : ''}${agentsBlock}\n`;

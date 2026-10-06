@@ -1,7 +1,7 @@
 {
   "name": "@obergodmar/agent-skills",
   "version": "0.1.0",
-  "description": "Private portable agent workflows for reproducible development, quality, and deployment",
+  "description": "Portable agent workflows for reproducible development, quality, and deployment",
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
@@ -18,8 +18,8 @@
   ],
   "type": "module",
   "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "scripts": {
     "skills": "node scripts/cli.mjs",
