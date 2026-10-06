@@ -2,8 +2,21 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import assert from 'node:assert/strict';
+import { pluginFiles, pluginManifest } from './plugin.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const plugin = pluginManifest(root);
+pluginFiles(root);
+const catalog = JSON.parse(readFileSync(join(root, '.agents/plugins/marketplace.json'), 'utf8'));
+assert.equal(catalog.name, plugin.name);
+assert.equal(catalog.plugins.length, 1);
+assert.equal(catalog.plugins[0].name, plugin.name);
+assert.deepEqual(catalog.plugins[0].source, { source: 'local', path: './' });
+assert.equal(catalog.plugins[0].policy.installation, 'AVAILABLE');
+assert.equal(catalog.plugins[0].policy.authentication, 'ON_USE');
+assert.equal(catalog.plugins[0].category, 'Productivity');
+assert.equal(JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).private, true);
 /** @type {string[]} */
 const yamlFiles = [];
 /** @param {string} folder */
@@ -68,4 +81,4 @@ for (const name of readdirSync(join(root, 'skills'))) {
   if (!existsSync(join(folder, 'agents/openai.yaml')))
     throw new Error(`Missing Codex metadata: ${name}`);
 }
-console.log('Skills, metadata, assets, local links, and portability checks passed');
+console.log('Plugin, marketplace, skills, metadata, links, and portability checks passed');

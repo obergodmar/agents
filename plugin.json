@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "agent-workflows",
+  "version": "0.2.0",
+  "description": "Reproducible development, project quality, and deployment workflows",
+  "author": {
+    "name": "obergodmar"
+  },
+  "repository": "https://github.com/obergodmar/agents",
+  "license": "UNLICENSED",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Agent Workflows",
+        "shortDescription": "Nix development, code quality, and deployment",
+        "developerName": "obergodmar",
+        "category": "Productivity"
+      }
+    }
+  }
+}

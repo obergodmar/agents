@@ -1,15 +1,14 @@
-# Agent workflows
+# Agent Workflows
 
-Public, English-language library of portable skills, configuration assets, and a Codex installer. Work on `master`; use Conventional Commits when a commit is requested.
+Public, English-language Codex plugin. Work on `master`; use Conventional Commits.
 
-- Enter through direnv or `devenv shell -- <command>`. Nix owns system tools; pnpm owns package dependencies.
-- Root package scripts are authoritative; devenv exposes `agents-*` wrappers.
-- Run `agents-check` and `agents-pack` after changes to instructions, assets, or installer behavior. Inspect the archive when changing publication contents.
-- Use 2 spaces for JS/TS, LF, Oxfmt, Oxlint, and TypeScript checking of JavaScript.
-- Keep skill entrypoints short. Put conditional procedures in linked references and generated configuration in assets. Avoid duplicating rules across skills.
-- Skills must contain no personal host names, checkout paths, addresses, credentials, or fixed infrastructure topology. Resolve the infrastructure checkout from the user's explicit choice.
-- Keep common working agreements in `instructions/project-baseline.md`; this file governs development of this library only.
-- Preserve product architecture. Implement selected tooling autonomously; discuss changes to hosting, databases, persistence, or application boundaries before introducing them.
-- Installer changes must preserve unmanaged files and reject locally modified managed content, unsafe paths, and symlinks. Test install/update/remove and failure cases in temporary directories.
-- No lifecycle installation hooks. No runtime dependencies in the installer. Never publish plaintext credentials or environment files.
-- npmjs.org is the public distribution target under the npm organization scope. GitHub and npm owners need not match. Use OIDC trusted publishing from GitHub Actions. Each master commit publishes a CI-only prerelease version; explicit version tags publish stable releases. PRs never publish. Preserve immutable versions.
+- Enter through direnv or `devenv shell -- <command>`. Nix owns system tools; pnpm owns development dependencies. `package.json` is private tooling, never a distributed package.
+- Root package scripts are authoritative; devenv exposes `agents-*` wrappers. Run `agents-check` and `agents-pack` after changes. Inspect ZIP contents when changing distribution.
+- Use 2 spaces for JS/TS, LF, Oxfmt, Oxlint, TypeScript, and EditorConfig.
+- Keep skill entrypoints short; put conditional procedures in linked references and configuration in assets. Preserve implicit invocation metadata.
+- Skills contain no personal host names, checkout paths, addresses, credentials, or fixed infrastructure topology. The user selects the infrastructure checkout for each operation.
+- `plugin.json` owns plugin identity/version; `.agents/plugins/marketplace.json` is the source catalog. Codex installs/caches plugins. Do not implement a second installer or add application dependencies for agent configuration.
+- Keep persistent project agreements in project `AGENTS.md`; `instructions/project-baseline.md` is a template, not automatically loaded plugin policy.
+- Preserve product architecture. Discuss hosting, database, persistence, or application boundary changes before introducing them.
+- Bundle only plugin metadata, skills, the instructions template, and README. No lifecycle hooks, runtime dependencies, secrets, or repository tooling in the ZIP.
+- CI checks pull requests and master pushes, then uploads a plugin ZIP. No npm or GitHub Packages publication. Project catalogs pin a reviewed Git commit; never silently advance them.

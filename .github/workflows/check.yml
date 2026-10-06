@@ -1,6 +1,8 @@
 name: Check
 on:
   pull_request:
+  push:
+    branches: [master]
 permissions:
   contents: read
 concurrency:
@@ -21,3 +23,8 @@ jobs:
       - run: devenv shell -- agents-install
       - run: devenv shell -- agents-check
       - run: devenv shell -- agents-pack
+      - uses: actions/upload-artifact@v4
+        with:
+          name: agent-workflows-${{ github.sha }}
+          path: artifacts/*.zip
+          if-no-files-found: error

@@ -1,28 +1,15 @@
 {
-  "name": "@obergodmar/agent-skills",
-  "version": "0.1.0",
+  "name": "agent-workflows-dev",
+  "version": "0.2.0",
+  "private": true,
   "description": "Portable agent workflows for reproducible development, quality, and deployment",
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/obergodmar/agents.git"
   },
-  "bin": {
-    "agent-workflows": "scripts/cli.mjs"
-  },
-  "files": [
-    "scripts/cli.mjs",
-    "skills/",
-    "instructions/",
-    "README.md"
-  ],
   "type": "module",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
-  },
   "scripts": {
-    "skills": "node scripts/cli.mjs",
     "validate": "node scripts/validate.mjs",
     "format": "oxfmt --write . && pnpm format:nix && pnpm format:yaml",
     "format:check": "oxfmt --check . && pnpm format:nix:check && pnpm format:yaml:check",

@@ -15,7 +15,6 @@ assert builtins.all (name: !(builtins.hasAttr name extra)) (builtins.attrNames g
 {
   packages = [
     pkgs.git
-    pkgs.gnutar
     pkgs.nixfmt
     pkgs.yamlfmt
     (pkgs.python3.withPackages (ps: [ ps.pyyaml ]))
