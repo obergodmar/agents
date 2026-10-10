@@ -10,5 +10,6 @@ Public, English-language Codex plugin. Work on `master`; use Conventional Commit
 - `plugin.json` owns plugin identity/version; `.agents/plugins/marketplace.json` is the source catalog. Codex installs/caches plugins. Do not implement a second installer or add application dependencies for agent configuration.
 - Keep persistent project agreements in project `AGENTS.md`; `instructions/project-baseline.md` is a template, not automatically loaded plugin policy.
 - Preserve product architecture. Discuss hosting, database, persistence, or application boundary changes before introducing them.
+- Native NixOS ports keep upstream compatibility and a small fork patch surface. Record the selected upstream base; separate functional changes from packaging and keep host policy in the consumer checkout.
 - Bundle only plugin metadata, skills, the instructions template, and README. No lifecycle hooks, runtime dependencies, secrets, or repository tooling in the ZIP.
 - CI checks pull requests and master pushes, then uploads a plugin ZIP. No npm or GitHub Packages publication. Project catalogs pin a reviewed Git commit; never silently advance them.

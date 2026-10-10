@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "agent-workflows",
-  "version": "0.2.0",
-  "description": "Reproducible development, project quality, and deployment workflows",
+  "version": "0.3.0",
+  "description": "Reproducible development, project quality, deployment, and native NixOS porting",
   "author": {
     "name": "obergodmar"
   },
@@ -12,7 +12,7 @@
     "com.openai": {
       "interface": {
         "displayName": "Agent Workflows",
-        "shortDescription": "Nix development, code quality, and deployment",
+        "shortDescription": "Nix workflows, quality, deployment, and native ports",
         "developerName": "obergodmar",
         "category": "Productivity"
       }

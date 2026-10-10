@@ -1,12 +1,13 @@
 # Agent Workflows
 
-A public Codex plugin with three reusable skills. Codex manages installation and its cache; application package.json files and builds need no agent dependency.
+A public Codex plugin with reusable skills. Codex manages installation and its cache; application package.json files and builds need no agent dependency.
 
-| Skill                | Purpose                                                      |
-| -------------------- | ------------------------------------------------------------ |
-| `devenv-workflow`    | Nix/devenv/direnv and prefixed project commands              |
-| `project-quality`    | EditorConfig, formatters, linters, and type checks           |
-| `project-deployment` | Vercel/GitHub or a user-selected Nix infrastructure checkout |
+| Skill                | Purpose                                                              |
+| -------------------- | -------------------------------------------------------------------- |
+| `devenv-workflow`    | Nix/devenv/direnv and prefixed project commands                      |
+| `project-quality`    | EditorConfig, formatters, linters, and type checks                   |
+| `project-deployment` | Vercel/GitHub or a user-selected Nix infrastructure checkout         |
+| `nixos-porting`      | Native NixOS application ports with small, maintainable fork patches |
 
 ## Install for yourself
 
@@ -79,7 +80,9 @@ Set `enabled = false` in project config to disable it there. `codex plugin remov
 
 `AGENTS.md` remains the project's persistent instructions. Adapt [the baseline template](instructions/project-baseline.md) to the project; Codex does not automatically load a plugin's `instructions/` folder.
 
-Select skills from Codex's skill picker or ask to use `devenv-workflow`, `project-quality`, or `project-deployment` from Agent Workflows. Implicit invocation is enabled. Reuse tooling decisions autonomously; architecture, providers/databases, and operational infrastructure scope remain user-owned.
+Select skills from Codex's skill picker or ask to use `devenv-workflow`, `project-quality`, `project-deployment`, or `nixos-porting` from Agent Workflows. Implicit invocation is enabled. Reuse tooling decisions autonomously; architecture, providers/databases, and operational infrastructure scope remain user-owned.
+
+For a native application port, a starting prompt is: "Use nixos-porting from Agent Workflows to port this application from Docker Compose to native NixOS. Expose a package and NixOS module through a locked flake, preserve existing installation methods, and keep the fork easy to rebase onto upstream's selected branch. Prepare and test the port without activating it on a live host." Prompts can be in any language; repository documentation stays English. Supply the upstream branch if already selected.
 
 For personal-host deployment, supply the infrastructure checkout for each operation. No personal infrastructure inventory is bundled.
 

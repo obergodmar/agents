@@ -1,0 +1,6 @@
+interface:
+  display_name: 'Native NixOS Porting'
+  short_description: 'Port applications to NixOS with small fork patches'
+  default_prompt: 'Use $nixos-porting to port this application to native NixOS through a flake while keeping the fork easy to rebase onto its selected upstream branch.'
+policy:
+  allow_implicit_invocation: true
